@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Form</title>
+</head>
+<body>
+    <h2>Investment Form</h2>
+    <p>Investing in: <strong>{{ fund_name }}</strong></p>
+    <form action="/submit_investment" method="POST">
+        <input type="hidden" name="fund_name" value="{{ fund_name }}">
+        <input type="hidden" name="fund_id" value="{{ fund_id }}">
+        <div>
+            <label for="amount">Amount to Invest:</label>
+            <input type="text" id="amount" name="amount" required>
+        </div>
+        <div>
+            <label for="duration">Investment Duration (in years):</label>
+            <input type="number" id="duration" name="duration" min="1" required>
+        </div>
+        <button type="submit">Submit Investment</button>
+    </form>
+</body>
+</html>

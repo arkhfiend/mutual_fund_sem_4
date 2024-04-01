@@ -2,7 +2,7 @@ from flask import Flask, render_template,request,redirect,url_for
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash,check_password_hash
 from bs4 import BeautifulSoup
-from models import db,User,MutualFund
+from models import db,User,MutualFund,Portfolio
 from auth import login_manager
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from admin import admin_bp  # Import the admin blueprint
@@ -51,6 +51,47 @@ def mutual_funds():
     mutual_funds_list = MutualFund.query.all()
     return render_template('mutual_funds.html', mutual_funds=mutual_funds_list)
 
+
+
+@app.route('/investment_form/<int:fund_id>')
+def investment_form(fund_id):
+    # Retrieve the fund name from the database based on its ID
+    fund = MutualFund.query.get(fund_id)
+    if fund:
+        fund_name = fund.name
+    else:
+        fund_name = None
+    return render_template('invest.html', fund_name=fund_name,fund_id=fund_id)
+
+@app.route('/submit_investment', methods=['POST'])
+def submit_investment():
+    # Process the form data
+    amount = request.form['amount']
+    duration = request.form['duration']
+    fund_id = request.form['fund_id']
+    user_id = current_user.id  # Assuming you're using Flask-Login
+    
+
+    # Create a new entry in the Portfolio table
+    portfolio_entry = Portfolio(user_id=user_id, fund_id=fund_id, amount=amount, duration=duration)
+    db.session.add(portfolio_entry)
+    db.session.commit()
+
+    # Redirect to the investment success page
+    return redirect(url_for('investment_success'))
+
+@app.route('/investment_success')
+def investment_success():
+    return render_template('investment_success.html')
+
+@app.route('/portfolio')
+@login_required
+def portfolio():
+    user_id = current_user.id
+    user_portfolio = Portfolio.query.filter_by(user_id=user_id).all()
+    return render_template('portfolio.html', user_portfolio=user_portfolio)
+
+
 @app.route('/submit_data', methods=['POST'])
 def submit_data():
     name = request.form.get('name')
@@ -92,7 +133,7 @@ def login():
             if user.is_admin:
                 return redirect(url_for('admin.admin_dashboard'))
             else:
-                return redirect(url_for('index'))
+                return redirect(url_for('mutual_funds'))
     return render_template('admin/login.html')
 
 @app.route('/signup', methods=['GET', 'POST'])
