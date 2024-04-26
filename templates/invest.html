@@ -19,6 +19,10 @@
             <label for="duration">Investment Duration (in years):</label>
             <input type="number" id="duration" name="duration" min="1" required>
         </div>
+        <div>
+            <label for="return_rate">Fund Return Rate:</label>
+            <input type="text" id="return_rate" name="return_rate" value="{{ fund_return }}" readonly>
+        </div>
         <button type="submit">Submit Investment</button>
     </form>
 </body>

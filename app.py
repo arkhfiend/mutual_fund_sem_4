@@ -2,12 +2,15 @@ from flask import Flask, render_template,request,redirect,url_for
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash,check_password_hash
 from bs4 import BeautifulSoup
-from models import db,User,MutualFund,Portfolio
+from scrape_and_store import scrape_and_store
+from models import db,User,MutualFund,Portfolio,MutualFunds
 from auth import login_manager
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from admin import admin_bp  # Import the admin blueprint
 #from auth import User
 from flask_migrate import Migrate
+from flask import jsonify
+from flask import flash
 from flask_bcrypt import Bcrypt
 import requests
 app = Flask(__name__)
@@ -32,6 +35,10 @@ migrate = Migrate(app, db)
 with app.app_context():
     #db.drop_all()
     db.create_all()
+    scrape_and_store()
+
+# Call the scrape_and_store function
+
 
 @app.route('/')
 def index():
@@ -45,23 +52,55 @@ def mf_info():
 @app.route('/data_entry')
 def data_entry():
     return render_template('data_entry.html')
-
-@app.route('/mutual_funds')
-def mutual_funds():
+#old version
+@app.route('/mutual_fund')
+def mutual_fund():
     mutual_funds_list = MutualFund.query.all()
     return render_template('mutual_funds.html', mutual_funds=mutual_funds_list)
 
+@app.route('/mutual_funds',methods=['GET','POST'])
+def mutual_funds():
+    name = None
+    morningstar_rating = None
+    if request.method == 'POST':
+        name = request.form.get('name')
+        morningstar_rating = request.form.get('morningstar_rating')
+        try:
+            if morningstar_rating:
+                morningstar_rating = int(morningstar_rating)
+        except ValueError:
+            morningstar_rating = ''
 
+    query = MutualFunds.query
+
+    if name:
+        query = query.filter(MutualFunds.name.like(f"%{name}%"))
+    if morningstar_rating != '':
+        query = query.filter(MutualFunds.morningstar_rating == morningstar_rating) 
+
+    # If both fields are empty, return all records
+    if request.method == 'GET' or (not name and morningstar_rating == ''):
+        mutual_funds_list = MutualFunds.query.all()
+    else:
+        mutual_funds_list = query.all()
+            
+    return render_template('mutual_fund_scrape.html', mutual_funds=mutual_funds_list)
 
 @app.route('/investment_form/<int:fund_id>')
 def investment_form(fund_id):
+    # Check if the user has already invested in this fund
+    if fund_id in [p.fund_id for p in current_user.portfolios]:
+        flash('You have already invested in this fund')
+        return redirect(url_for('mutual_funds'))
     # Retrieve the fund name from the database based on its ID
-    fund = MutualFund.query.get(fund_id)
+    fund = MutualFunds.query.get(fund_id)
     if fund:
         fund_name = fund.name
+        fund_return = fund.fund_return
     else:
         fund_name = None
-    return render_template('invest.html', fund_name=fund_name,fund_id=fund_id)
+        fund_return = None
+    return render_template('invest.html', fund_name=fund_name,fund_return=fund_return,fund_id=fund_id)
 
 @app.route('/submit_investment', methods=['POST'])
 def submit_investment():
@@ -89,7 +128,15 @@ def investment_success():
 def portfolio():
     user_id = current_user.id
     user_portfolio = Portfolio.query.filter_by(user_id=user_id).all()
-    return render_template('portfolio.html', user_portfolio=user_portfolio)
+    portfolio_funds = [p.fund_id for p in current_user.portfolios]  # Add this line here
+    # Prepare data for the charts
+    chart_data = []
+    for entry in user_portfolio:
+        labels = ['Invested Amount', 'Return']
+        data = [entry.amount, entry.return_amount]  # Use the calculate_return method of the Portfolio model
+        chart_data.append({'labels': labels, 'data': data})
+    #return render_template('portfolio.html', user_portfolio=user_portfolio)
+    return render_template('portfolio.html', user_portfolio=user_portfolio, chart_data=chart_data,portfolio_funds=portfolio_funds)
 
 
 @app.route('/submit_data', methods=['POST'])
@@ -124,7 +171,7 @@ def filter_funds():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    # Implement login logic
+    # Implement login logic here
     if request.method == 'POST':
         # Validate user credentials and log them in
         user = User.query.filter_by(username=request.form['username']).first()
@@ -137,7 +184,7 @@ def login():
     return render_template('admin/login.html')
 
 @app.route('/signup', methods=['GET', 'POST'])
-def signup():
+def signup(): 
     # Implement the signup logic here
     if request.method == 'POST':
         username = request.form['username']
@@ -163,6 +210,58 @@ def signup():
 
 
     return render_template('admin/signup.html')
+#to add user by admin
+@app.route('/add_user', methods=['GET', 'POST'])
+def add_user():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        role = request.form.get('role')
+
+        # Add code here to add the new user to your database
+         # Create a new user instance
+        new_user = User(
+            username=username,
+            password_hash=bcrypt.generate_password_hash(password).decode('utf-8'),
+            is_admin=True if role == 'admin' else False
+        )
+
+        # Add the new user to the database
+        db.session.add(new_user)
+        db.session.commit()
+
+        return redirect(url_for('admin.manage_users'))
+
+    return render_template('admin/add_user.html')
+
+#manage users portfolio by admin
+@app.route('/admin/manage_portfolios', methods=['GET'])
+def manage_portfolios():
+    # Query all users and their portfolios from the database
+    users = User.query.all()
+
+    return render_template('admin/manage_portfolios.html', users=users)
+
+@app.route('/admin/delete_fund/<int:user_id>/<int:fund_id>', methods=['POST'])
+def delete_fund(user_id, fund_id):
+    # Query the user and the fund from the database
+    user = User.query.get(user_id)
+    fund_to_delete = None
+    for portfolio in user.portfolios:
+        if portfolio.fund.id == fund_id:
+            fund_to_delete = portfolio
+            break
+    if fund_to_delete:
+        # Delete the fund
+        db.session.delete(fund_to_delete)
+        db.session.commit()
+    else:
+        # Fund not found
+        flash('Fund not found', 'error')
+       
+
+
+    return redirect(url_for('admin.manage_users'))
 
 def get_financial_news():
     #api_key = 'H9D3T215Q1U9UUAM'

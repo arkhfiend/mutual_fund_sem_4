@@ -1,0 +1,69 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Mutual Funds</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+</head>
+<body>
+    <!-- Code to display flash messages -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert alert-warning">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    <h2>Mutual Funds</h2>
+    {% if current_user.is_authenticated %}
+    <a href="{{ url_for('portfolio') }}">View Portfolio</a>
+    {% endif %}
+    <form method="POST" action="{{ url_for('mutual_funds') }}">
+        <input type="text" name="name" placeholder="Fund Name">
+        <input type="number" name="morningstar_rating" placeholder="Star Rating">
+        <!-- add more fields as needed -->
+        <button type="submit">Search</button>
+    </form>
+    <br>
+    <div class="container">
+    <table class="table table-striped">
+        <thead class="thead-dark">
+        <tr>
+            <th>Name</th>
+            <th>Category Rank</th>
+            <th>Morningstar Rating</th>
+            <th>NAV</th>
+            <th>Fund Return</th>
+            <th>Category Return</th>
+            <th>Risk</th>
+            <th>Fund Size</th>
+            <th>Action</th>
+        </tr>
+        {% for fund in mutual_funds %}
+        <tr>
+            <td>{{ fund.name }}</td>
+            <td>{{ fund.category_rank }}</td>
+            <td>{{ fund.morningstar_rating }}</td>
+            <td>{{ fund.nav }}</td>
+            <td>{{ fund.fund_return }}</td>
+            <td>{{ fund.category_return }}</td>
+            <td>{{ fund.risk }}</td>
+            <td>{{ fund.fund_size }}</td>
+            <td>
+                {% if fund.id in portfolio_funds %}
+                <div class="alert alert-warning" role="alert">
+                    Already invested in this fund
+                </div>
+            {% else %}
+                <a href="{{ url_for('login') if not current_user.is_authenticated else url_for('investment_form', fund_id=fund.id) }}" class="btn btn-primary">Invest</a>
+            {% endif %}
+            
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+</body>
+</html>
