@@ -1,22 +1,32 @@
-<!DOCTYPE html>
+<!-- templates\admin\add_user.html -->
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+  
+    <meta charset="UTF-8" />
+  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
     <title>Add User</title>
-</head>
-<body>
+  
+    <link rel="stylesheet" href="../../static/add_user.css" />
+  </head>
+  <body>
+  
     <form method="POST">
-        <label for="username">Username:</label><br>
-        <input type="text" id="username" name="username"><br>
-        <label for="password">Password:</label><br>
-        <input type="password" id="password" name="password"><br>
-        <label for="role">Role:</label><br>
-        <select id="role" name="role">
-            <option value="general">General User</option>
-            <option value="admin">Admin User</option>
-        </select><br>
-        <input type="submit" value="Add User">
+     <label for="username">Username:</label><br />
+     <input type="text" id="username" name="username" /><br />
+     <label for="password">Password:</label><br />
+     <input type="password" id="password" name="password" /><br />
+     <label for="role">Role:</label><br />
+    
+      <select id="role" name="role">
+      
+        <option value="general">General User</option>
+      
+        <option value="admin">Admin User</option>
+      </select
+      ><br />
+     <input type="submit" value="Add User" />
     </form>
-</body>
+  </body>
 </html>

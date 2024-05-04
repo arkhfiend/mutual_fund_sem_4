@@ -1,0 +1,110 @@
+.link-decoursion-none {
+    text-decoration: none;
+    color: aliceblue;
+}
+.signup{
+    text-decoration: none;
+    color: black;
+}
+.body {
+    width: 100%;
+    height:50vh;
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+    animation: slide-in 1s ease-in-out;
+}
+.body:start{
+    animation: slide-out 1s ease-in-out;
+}
+
+@keyframes slide-in {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slide-out {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(100%);
+    }
+}
+
+.body1 {
+    width: 500px;
+    height: 300px;
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    position: relative;
+    animation: slide-in 1s ease-in-out;
+}
+
+.body1.slide-out {
+    animation: slide-out 1s ease-in-out;
+}
+
+.flex-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.box {
+    width: 200px;
+    height: 100px;
+    background-color: #f2f2f2;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-top: 20px;
+    animation: fade-in 1s ease-in-out;
+}
+
+.box.fade-out {
+    animation: fade-out 1s ease-in-out;
+}
+
+@keyframes slide-in {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes slide-out {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(100%);
+    }
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes fade-out {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}

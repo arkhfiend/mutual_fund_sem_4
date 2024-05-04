@@ -1,40 +1,100 @@
-<!-- data_entry.html -->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Entry Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
 </head>
 <body>
     <h1>Data Entry Form</h1>
-     <!-- Add a link to navigate to the list of mutual funds -->
-     <p><a href="/mutual_funds">View Mutual Funds</a></p>
-     
-    <form action="/submit_data" method="post">
-        <label for="name">Name:</label>
-        <input type="text" name="name" required><br>
-        
-        <label for="fund_type">Fund Type:</label>
-        <input type="text" name="fund_type" required><br>
-        
-        <label for="nav">Net Asset Value (NAV):</label>
-        <input type="number" name="nav" step="0.01" required><br>
-        
-        <label for="returns">Returns:</label>
-        <input type="number" name="returns" step="0.01" required><br>
+    <div class="container">
+        <form action="/submit_data" method="post">
+            <label for="name">Name:</label>
+            <input type="text" name="name" required><br>
 
-                <!-- Add the Risk Tolerance field -->
-                <label for="risk_tolerance">Risk Tolerance:</label>
-                <select name="risk_tolerance" required>
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                </select><br>
+            <label for="fund_type">Fund Type:</label>
+            <input type="text" name="fund_type" required><br>
+
+            <label for="nav">Net Asset Value (NAV):</label>
+            <input type="number" name="nav" step="0.01" required><br>
+
+            <label for="returns">Returns:</label>
+            <input type="number" name="returns" step="0.01" required><br>
+
+            <!-- Add the Risk Tolerance field -->
+            <label for="risk_tolerance">Risk Tolerance:</label>
+            <select name="risk_tolerance" required>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+            </select><br>
+
+            <button type="submit">Submit</button>
+        </form>
         
-        
-        <button type="submit">Submit</button>
-    </form>
+    </div>
 </body>
 </html>

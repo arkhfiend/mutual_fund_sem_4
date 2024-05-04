@@ -10,6 +10,70 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
 <body>
+    
+    {% if login_state %}
+    <header class="p-3 mb-3 border-bottom">
+      <div class="container">
+        <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+          <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 link-body-emphasis text-decoration-none">
+            <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"></use></svg>
+          </a>
+    
+          <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+            <li><a href="#" class="nav-link px-2 text-black">Home</a></li>
+            <li><a href="{{ url_for('mutual_funds') }}" class="nav-link px-2 text-black">Mutual funds</a></li>
+            <li><a href="{{ url_for('portfolio') }}" class="nav-link px-2 text-black">Portfolio</a></li>
+            <li><a href="{{ url_for('dictionary') }}" class="nav-link px-2 text-black">Dictionary</a></li>
+            <li><a href="{{ url_for('about') }}" class="nav-link px-2 text-black">About</a></li>
+          </ul>
+    
+          <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
+            <input type="search" class="form-control" placeholder="Search..." aria-label="Search">
+          </form>
+    
+          <div class="dropdown text-end">
+            <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+              <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32" class="rounded-circle">
+            </a>
+            <ul class="dropdown-menu text-small">
+              <li><a class="dropdown-item" href="#">New project...</a></li>
+              <li><a class="dropdown-item" href="#">Settings</a></li>
+              <li><a class="dropdown-item" href="#">Profile</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item btn-danger" href="{{ url_for('logout') }}">logout</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </header>
+    
+  {% else %}
+  <header class="p-3 text-bg-dark">
+    <div class="container">
+      <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+        <a href="/" class="d-flex align-items-center mb-2 mb-lg-0 text-white text-decoration-none">
+          <svg class="bi me-2" width="40" height="32" role="img" aria-label="Bootstrap"><use xlink:href="#bootstrap"></use></svg>
+        </a>
+  
+        <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+          <li><a href="#" class="nav-link px-2 text-white">Home</a></li>
+          <li><a href="{{ url_for('mutual_funds') }}" class="nav-link px-2 text-white">Mutual funds</a></li>
+          <li><a href="{{ url_for('dictionary') }}" class="nav-link px-2 text-white">Dictionary</a></li>
+          <li><a href="{{ url_for('about') }}" class="nav-link px-2 text-white">About</a></li>
+        </ul>
+  
+        <form class="col-12 col-lg-auto mb-3 mb-lg-0 me-lg-3" role="search">
+          <input type="search" class="form-control form-control-dark text-bg-dark" placeholder="Search..." aria-label="Search">
+        </form>
+  
+        <div class="text-end">
+          <button type="button" class="btn btn-outline-light me-2"><a class="link-decoursion-none" href="{{ url_for('login') }}">Login</a></button>
+          <button type="button" class="btn btn-warning"><a class="signup" href="{{ url_for('signup') }}">Sign-up</a></button>
+        </div>
+      </div>
+    </div>
+  </header>
+  {% endif %}
     <div class="container mt-5">
         <h1 class="mb-4">Filtered Funds</h1>
 

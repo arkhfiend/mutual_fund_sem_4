@@ -4,11 +4,52 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Investment Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f2f2f2;
+        }
+        h2 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            margin-bottom: 10px;
+        }
+        button[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 <body>
     <h2>Investment Form</h2>
     <p>Investing in: <strong>{{ fund_name }}</strong></p>
-    <form action="/submit_investment" method="POST">
+    <form action="/submit_investment" method="POST" onsubmit="showToast()">
         <input type="hidden" name="fund_name" value="{{ fund_name }}">
         <input type="hidden" name="fund_id" value="{{ fund_id }}">
         <div>
@@ -25,5 +66,13 @@
         </div>
         <button type="submit">Submit Investment</button>
     </form>
+    <script>
+        function showToast() {
+            alert("Successful Investment!");
+            setTimeout(function() {
+                window.location.href = '/mutual_funds';
+            }, 5000);
+        }
+    </script>
 </body>
 </html>

@@ -19,7 +19,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'c5064ddd7c72e2b528a770ff179e4d42'
 
 # Replace 'mysql://username:password@localhost/dbname' with your MySQL connection details
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:Aarya%401971@localhost/mfdb'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:omg oh my god@localhost/mfdb'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 app.register_blueprint(admin_bp)
@@ -39,7 +39,11 @@ with app.app_context():
 
 # Call the scrape_and_store function
 
-
+login_state = False
+# Context processor to pass login_state to all templates
+@app.context_processor
+def inject_login_state():
+    return {'login_state': login_state}
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -83,8 +87,8 @@ def mutual_funds():
         mutual_funds_list = MutualFunds.query.all()
     else:
         mutual_funds_list = query.all()
-            
-    return render_template('mutual_fund_scrape.html', mutual_funds=mutual_funds_list)
+    login_state = current_user.is_authenticated
+    return render_template('mutual_fund_scrape.html', mutual_funds=mutual_funds_list, login_state=login_state)
 
 @app.route('/investment_form/<int:fund_id>')
 def investment_form(fund_id):
@@ -117,11 +121,17 @@ def submit_investment():
     db.session.commit()
 
     # Redirect to the investment success page
-    return redirect(url_for('investment_success'))
+    return redirect(url_for('mutual_funds'))
 
-@app.route('/investment_success')
-def investment_success():
-    return render_template('investment_success.html')
+@app.route('/dictionary')
+def dictionary():
+    login_state = current_user.is_authenticated
+    return render_template('imformation.html', login_state=login_state)
+
+@app.route('/about')
+def about():
+    login_state = current_user.is_authenticated
+    return render_template('about.html', login_state=login_state)
 
 @app.route('/portfolio')
 @login_required
@@ -135,8 +145,9 @@ def portfolio():
         labels = ['Invested Amount', 'Return']
         data = [entry.amount, entry.return_amount]  # Use the calculate_return method of the Portfolio model
         chart_data.append({'labels': labels, 'data': data})
+        login_state = current_user.is_authenticated
     #return render_template('portfolio.html', user_portfolio=user_portfolio)
-    return render_template('portfolio.html', user_portfolio=user_portfolio, chart_data=chart_data,portfolio_funds=portfolio_funds)
+    return render_template('portfolio.html', user_portfolio=user_portfolio, chart_data=chart_data,portfolio_funds=portfolio_funds, login_state=login_state, user_name=current_user.username)
 
 
 @app.route('/submit_data', methods=['POST'])
@@ -169,6 +180,11 @@ def filter_funds():
     # If it's a GET request, render the page with the form
     return render_template('filter_funds.html')
 
+@app.route('/dashboard')
+def dashboard():
+    login_state = current_user.is_authenticated
+    return render_template('index.html', login_state=login_state)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     # Implement login logic here
@@ -178,9 +194,11 @@ def login():
         if user and bcrypt.check_password_hash(user.password_hash, request.form['password']):
             login_user(user)
             if user.is_admin:
-                return redirect(url_for('admin.admin_dashboard'))
+                return redirect(url_for('admin.admin_dashboard', user_name=user.username, user_id=user.id))
             else:
-                return redirect(url_for('mutual_funds'))
+                return redirect(url_for('dashboard'))
+    
+    login_state = current_user.is_authenticated
     return render_template('admin/login.html')
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -261,7 +279,7 @@ def delete_fund(user_id, fund_id):
        
 
 
-    return redirect(url_for('admin.manage_users'))
+    return redirect(url_for('manage_portfolios'))
 
 def get_financial_news():
     #api_key = 'H9D3T215Q1U9UUAM'
@@ -281,19 +299,14 @@ def get_financial_news():
 
 @app.route('/daily_news')
 def daily_news():
-    news_data = get_financial_news()
-    print('News Data:', news_data)
-    if news_data is not None:
-        return render_template('daily_news.html', news_data=news_data)
-    else:
-        # Handle the case where news_data is None (e.g., API request failed)
-        return render_template('daily_news.html', news_data=[])
-
+    login_state = current_user.is_authenticated
+    return render_template('daily_news.html', login_state=login_state)
 @app.route('/logout')
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('index'))
+    login_state = False
+    return render_template('index.html')
 
 if __name__ == '__main__':
     app.run(debug=True)
